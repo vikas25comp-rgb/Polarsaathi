@@ -218,7 +218,13 @@ export const SettingsTab: React.FC = () => {
               ) : (
                 <>
                   <XCircle className="w-3 h-3" />
-                  <span>HIGH DEMAND / RETRY</span>
+                  <span>
+                    {aiStatus.message.toLowerCase().includes('demand')
+                      ? 'HIGH DEMAND / RETRY'
+                      : aiStatus.message.includes('500')
+                      ? 'SERVER 500 ERROR'
+                      : 'CONNECTION ERROR'}
+                  </span>
                 </>
               )}
             </span>

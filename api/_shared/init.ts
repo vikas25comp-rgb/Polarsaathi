@@ -7,8 +7,7 @@
  * The `_shared` prefix with underscore means Vercel will NOT treat
  * this directory as a route.
  */
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 
 export { polarAgent } from '../../server/agent/polarAgent';
 export {
