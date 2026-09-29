@@ -232,6 +232,39 @@ app.post('/api/gemini/report', async (req: Request, res: Response): Promise<void
   }
 });
 
+// AI Agent & Gemini Connection Status Check Endpoint
+app.get('/api/gemini/status', async (_req: Request, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    res.json({
+      configured: false,
+      status: 'missing_key',
+      message: 'GEMINI_API_KEY is not set in environment.',
+      model: 'none',
+      latencyMs: 0,
+    });
+    return;
+  }
+
+  try {
+    const status = await polarAgent.checkConnection();
+    const latencyMs = Date.now() - startTime;
+    res.json({
+      configured: true,
+      ...status,
+      latencyMs,
+    });
+  } catch (err: any) {
+    res.json({
+      configured: true,
+      status: 'error',
+      message: err.message || 'Failed to connect to Gemini API',
+      latencyMs: Date.now() - startTime,
+    });
+  }
+});
+
 // Helper function to resolve dist directory robustly
 function resolveDistDir(): string {
   const candidates = [

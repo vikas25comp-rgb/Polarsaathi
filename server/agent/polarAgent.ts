@@ -443,8 +443,13 @@ COMMUNICATION:
 - For safety or emergency questions, state the relevant uncertainty and advise following the station's established procedures.
 - Do not fabricate sources, weather readings, inventory counts, personnel counts, or action results.`;
 
-    // Try primary high-throughput model first, then fallback model
-    const candidateModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+    // Try active high-throughput models first with progressive fallback
+    const candidateModels = [
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-3.8-flash',
+    ];
 
     for (const modelName of candidateModels) {
       const contents: any[] = [];
@@ -1111,6 +1116,48 @@ You can also tap the **Microphone button** 🎙️ and talk to me with your voic
       targetStationId: 'st-bharati',
       actionType: 'resupply_priority',
       impact: 'Prevents supply gap and maintains polar life-support safety margin.',
+    };
+  }
+
+  public async checkConnection(): Promise<{
+    status: 'connected' | 'error' | 'missing_key';
+    model: string;
+    message: string;
+  }> {
+    const aiInstance = this.getAI();
+    if (!aiInstance) {
+      return {
+        status: 'missing_key',
+        model: 'none',
+        message: 'No GEMINI_API_KEY detected in environment variables.',
+      };
+    }
+
+    const testModels = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+    let lastError = '';
+
+    for (const model of testModels) {
+      try {
+        const response = await aiInstance.models.generateContent({
+          model,
+          contents: 'Ping: polar station connectivity test',
+        });
+        if (response && response.text) {
+          return {
+            status: 'connected',
+            model,
+            message: `Connected successfully to Google Gemini (${model}).`,
+          };
+        }
+      } catch (err: any) {
+        lastError = err.message || String(err);
+      }
+    }
+
+    return {
+      status: 'error',
+      model: testModels[0],
+      message: `Gemini ping failed: ${lastError}`,
     };
   }
 }
