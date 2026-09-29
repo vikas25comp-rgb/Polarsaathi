@@ -1,0 +1,6 @@
+{
+  "name": "POLAR-SATHI — Polar Expedition Logistics & Emergency System",
+  "description": "AI-Powered Integrated Polar Expedition Logistics, Supply Forecasting, Asset & Emergency Management System (SIH26062).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
