@@ -3,7 +3,7 @@ import {
   getPendingOperationalAction,
   rejectOperationalAction,
   executeOperationalAction,
-} from '../../_shared/init';
+} from '../_shared/init';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

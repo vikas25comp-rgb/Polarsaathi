@@ -378,20 +378,36 @@ const toolMap: Record<string, (args: any) => Promise<any>> = {
 };
 
 export class PolarOperationsAgent {
-  private ai: GoogleGenAI | null;
+  private ai: GoogleGenAI | null = null;
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.GEMINI_API_KEY || '';
-    this.ai = key
-      ? new GoogleGenAI({
-          apiKey: key,
-          httpOptions: {
-            headers: {
-              'User-Agent': 'aistudio-build',
-            },
+    if (key) {
+      this.ai = new GoogleGenAI({
+        apiKey: key,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
           },
-        })
-      : null;
+        },
+      });
+    }
+  }
+
+  private getAI(): GoogleGenAI | null {
+    if (this.ai) return this.ai;
+    const key = process.env.GEMINI_API_KEY || '';
+    if (key) {
+      this.ai = new GoogleGenAI({
+        apiKey: key,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
+        },
+      });
+    }
+    return this.ai;
   }
 
   public async runAgent(
@@ -402,7 +418,8 @@ export class PolarOperationsAgent {
     const sourcesSet = new Set<string>();
     let pendingAction: any = undefined;
 
-    if (!this.ai) {
+    const aiInstance = this.getAI();
+    if (!aiInstance) {
       return this.runDeterministicAgent(userPrompt);
     }
 
@@ -453,7 +470,7 @@ COMMUNICATION:
         while (iterations < maxIterations) {
           iterations++;
 
-          const response = await this.ai.models.generateContent({
+          const response = await aiInstance.models.generateContent({
             model: modelName,
             contents,
             config: {

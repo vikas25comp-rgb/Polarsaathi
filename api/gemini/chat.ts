@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { polarAgent, syncServerStore } from '../../_shared/init';
+import { polarAgent, syncServerStore } from '../_shared/init';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
